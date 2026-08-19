@@ -20,14 +20,14 @@ export const USERS_ROLE_MAP: Record<string, UserPermissions> = {
     facultadesPermitidas: ['TODAS'],
     escuelasPermitidas: ['TODAS'],
   },
-  'dir.ciencias@unsa.edu.pe': {
+  'esiug@unsa.edu.pe': {
     role: 'DIRECTOR_CIENCIAS_TECNOLOGIA',
     name: 'Dra. Carmen Suárez (Directora Cs. y Tecnología)',
     label: 'Director de Escuela: Cs. y Tecnología',
     facultadesPermitidas: ['Ingeniería de Procesos', 'Ingeniería de Producción y Servicios', 'Ciencias Naturales'],
     escuelasPermitidas: ['Ingeniería de Sistemas', 'Ciencia de la Computación', 'Química', 'Física'],
   },
-  'dir.humanidades@unsa.edu.pe': {
+  'jleonq@unsa.edu.pe': {
     role: 'DIRECTOR_HUMANIDADES',
     name: 'Mg. Roberto Mendoza (Director Humanidades)',
     label: 'Director de Escuela: Humanidades y Letras',
