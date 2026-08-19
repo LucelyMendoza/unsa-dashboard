@@ -12,10 +12,8 @@ export interface UserPermissions {
   escuelasPermitidas: string[];
   label: string;
 }
-
-// Mapeo por lista blanca de correos institucionales
 export const USERS_ROLE_MAP: Record<string, UserPermissions> = {
-  'decano@unsa.edu.pe': {
+  'lmendoza@unsa.edu.pe': {
     role: 'DIRECTOR_FACULTAD',
     name: 'Dr. Hugo Rivera (Decano / Director de Facultad)',
     label: 'Director de Facultad',
