@@ -594,5 +594,73 @@ window.addEventListener('load',()=>{
   renderAll();
 });
 </script>
+<script>
+(function() {
+  // Obtener las escuelas permitidas desde Next.js
+  const params = new URLSearchParams(window.location.search);
+  const role = params.get('role');
+  const allowedRaw = params.get('escuelas') || '';
+  const allowedEscuelas = allowedRaw.split(',').map(s => s.trim().toUpperCase()).filter(Boolean);
+
+  console.log("Control de acceso activo:", { role, allowedEscuelas });
+
+  function aplicarRestriccion() {
+    if (!role || role === 'DIRECTOR_FACULTAD') return; // Director de Facultad tiene acceso completo
+
+    // Filtrar todos los selectores de la página
+    const selectElements = document.querySelectorAll('select');
+
+    selectElements.forEach(select => {
+      let tieneOpcionesEscuela = false;
+
+      Array.from(select.options).forEach(opt => {
+        const txt = (opt.text || opt.value || '').trim().toUpperCase();
+        
+        // Verifica si la opción pertenece al catálogo de escuelas
+        const esOpcionEscuela = ["GENERALES", "CIENCIAS Y TECNOLOGÍA", "HUMANIDADES Y LETRAS", "EDUCACIÓN BÁSICA INTEGRAL"].some(e => txt.includes(e));
+
+        if (esOpcionEscuela) {
+          tieneOpcionesEscuela = true;
+          const estaPermitida = allowedEscuelas.some(e => txt.includes(e));
+          if (!estaPermitida) {
+            opt.disabled = true;
+            opt.hidden = true;
+            opt.style.display = 'none';
+          }
+        }
+      });
+
+      // Si este select era el de escuelas, seleccionar la primera válida automáticamente
+      if (tieneOpcionesEscuela) {
+        const opcionValida = Array.from(select.options).find(o => !o.disabled && o.style.display !== 'none');
+        if (opcionValida && select.value !== opcionValida.value) {
+          select.value = opcionValida.value;
+          select.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+      }
+    });
+
+    // Si tu dashboard usa botones o pestañas para cambiar de escuela en lugar de <select>
+    const botones = document.querySelectorAll('button, a, .tab-item, [role="tab"]');
+    botones.forEach(btn => {
+      const txt = (btn.innerText || btn.textContent || '').trim().toUpperCase();
+      const esBotonEscuela = ["GENERALES", "CIENCIAS Y TECNOLOGÍA", "HUMANIDADES Y LETRAS", "EDUCACIÓN BÁSICA INTEGRAL"].some(e => txt.includes(e));
+
+      if (esBotonEscuela) {
+        const estaPermitido = allowedEscuelas.some(e => txt.includes(e));
+        if (!estaPermitido) {
+          btn.style.display = 'none';
+          btn.style.pointerEvents = 'none';
+        }
+      }
+    });
+  }
+
+  // Ejecutar al cargar y tras renderizar los gráficos
+  window.addEventListener('DOMContentLoaded', aplicarRestriccion);
+  setTimeout(aplicarRestriccion, 500);
+  setTimeout(aplicarRestriccion, 1500);
+})();
+</script>
 </body>
 </html>

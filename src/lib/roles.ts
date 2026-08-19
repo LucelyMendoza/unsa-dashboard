@@ -8,45 +8,48 @@ export type UserRole =
 export interface UserPermissions {
   role: UserRole;
   name: string;
-  facultadesPermitidas: string[];
   escuelasPermitidas: string[];
   label: string;
 }
+
 export const USERS_ROLE_MAP: Record<string, UserPermissions> = {
+  // Director de Facultad: Ve GENERALES y todas las escuelas
   'lmendoza@unsa.edu.pe': {
     role: 'DIRECTOR_FACULTAD',
-    name: 'Dr. Hugo Rivera (Decano / Director de Facultad)',
-    label: 'Director de Facultad',
-    facultadesPermitidas: ['TODAS'],
-    escuelasPermitidas: ['TODAS'],
+    name: 'Director / Decano de Facultad',
+    label: 'Dirección de Facultad (Acceso Total)',
+    escuelasPermitidas: ['GENERALES', 'CIENCIAS Y TECNOLOGÍA', 'HUMANIDADES Y LETRAS', 'EDUCACIÓN BÁSICA INTEGRAL'],
   },
+
+  // Director de Escuela: Ciencias y Tecnología
   'esiug@unsa.edu.pe': {
     role: 'DIRECTOR_CIENCIAS_TECNOLOGIA',
-    name: 'Dra. Carmen Suárez (Directora Cs. y Tecnología)',
-    label: 'Director de Escuela: Cs. y Tecnología',
-    facultadesPermitidas: ['Ingeniería de Procesos', 'Ingeniería de Producción y Servicios', 'Ciencias Naturales'],
-    escuelasPermitidas: ['Ingeniería de Sistemas', 'Ciencia de la Computación', 'Química', 'Física'],
+    name: 'Director de Escuela',
+    label: 'Escuela de Ciencias y Tecnología',
+    escuelasPermitidas: ['CIENCIAS Y TECNOLOGÍA'],
   },
+
+  // Director de Escuela: Humanidades y Letras
   'jleonq@unsa.edu.pe': {
     role: 'DIRECTOR_HUMANIDADES',
-    name: 'Mg. Roberto Mendoza (Director Humanidades)',
-    label: 'Director de Escuela: Humanidades y Letras',
-    facultadesPermitidas: ['Filosofía y Humanidades', 'Ciencias Histórico Sociales'],
-    escuelasPermitidas: ['Literatura y Lingüística', 'Filosofía', 'Historia', 'Artes'],
+    name: 'Director de Escuela',
+    label: 'Escuela de Humanidades y Letras',
+    escuelasPermitidas: ['HUMANIDADES Y LETRAS'],
   },
+
+  // Director de Escuela: Educación Básica e Integral
   'dir.educacion@unsa.edu.pe': {
     role: 'DIRECTOR_EDUCACION',
-    name: 'Dra. Elena Vargas (Directora Educación Básica)',
-    label: 'Director de Escuela: Educación Básica e Integral',
-    facultadesPermitidas: ['Ciencias de la Educación'],
-    escuelasPermitidas: ['Educación Inicial', 'Educación Primaria', 'Educación Secundaria'],
+    name: 'Director de Escuela',
+    label: 'Escuela de Educación Básica Integral',
+    escuelasPermitidas: ['EDUCACIÓN BÁSICA INTEGRAL'],
   },
 };
 
 export const ROLE_LABELS: Record<UserRole, string> = {
   DIRECTOR_FACULTAD: 'Dirección General de Facultad',
-  DIRECTOR_CIENCIAS_TECNOLOGIA: 'Dirección de Escuela de Ciencias y Tecnología',
+  DIRECTOR_CIENCIAS_TECNOLOGIA: 'Dirección de Ciencias y Tecnología',
   DIRECTOR_HUMANIDADES: 'Dirección de Humanidades y Letras',
-  DIRECTOR_EDUCACION: 'Dirección de Educación Básica e Integral',
+  DIRECTOR_EDUCACION: 'Dirección de Educación Básica Integral',
   INVITADO: 'Acceso Restringido',
 };
