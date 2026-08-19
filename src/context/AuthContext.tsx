@@ -1,7 +1,14 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { User, onAuthStateChanged, signInWithPopup, signOut } from 'firebase/auth';
+import {
+  User,
+  onAuthStateChanged,
+  signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
+  signOut
+} from 'firebase/auth';
 import { auth, googleProvider } from '@/lib/firebase';
 import { USERS_ROLE_MAP, UserPermissions, UserRole } from '@/lib/roles';
 import { useRouter } from 'next/navigation';
@@ -23,10 +30,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
 
   useEffect(() => {
+    // Procesa el retorno en caso de que se haya ejecutado signInWithRedirect
+    getRedirectResult(auth)
+      .then((result) => {
+        if (result?.user) {
+          router.push('/');
+        }
+      })
+      .catch((err) => {
+        console.error('Error al capturar redirect result:', err);
+      });
+
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       if (currentUser && currentUser.email) {
         setUser(currentUser);
-        // Si el correo está en la tabla de asignación de roles, se extraen sus permisos
         const userPerms = USERS_ROLE_MAP[currentUser.email.toLowerCase()] || {
           role: 'INVITADO' as UserRole,
           name: currentUser.displayName || currentUser.email,
@@ -43,7 +60,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [router]);
 
   const loginWithGoogle = async () => {
     try {
@@ -52,8 +69,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         router.push('/');
       }
     } catch (err: any) {
-      console.error('Error al autenticar:', err);
-      alert('Error al conectar con Google: ' + err.message);
+      // Fallback si el navegador bloquea la ventana emergente
+      if (
+        err.code === 'auth/popup-blocked' ||
+        err.code === 'auth/cancelled-popup-request' ||
+        err.code === 'auth/popup-closed-by-user'
+      ) {
+        console.warn('Popup bloqueado o cerrado. Redirigiendo...');
+        await signInWithRedirect(auth, googleProvider);
+      } else {
+        console.error('Error al autenticar:', err);
+        alert('Error al conectar con Google: ' + err.message);
+      }
     }
   };
 
