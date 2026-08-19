@@ -9,8 +9,18 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        background: "var(--background)",
-        foreground: "var(--foreground)",
+        granate: {
+          DEFAULT: '#7A1C28',
+          dark: '#5A1620',
+          light: '#9E2A38',
+        },
+        dorado: {
+          DEFAULT: '#C5A059',
+          light: '#E6CA85',
+        },
+        papel: '#FAF7F2',
+        crema: '#F4ECE1',
+        linea: '#E6D9C8',
       },
     },
   },
