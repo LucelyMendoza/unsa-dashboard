@@ -14,7 +14,7 @@ export interface UserPermissions {
 
 export const USERS_ROLE_MAP: Record<string, UserPermissions> = {
   // Director de Facultad: Ve GENERALES y todas las escuelas
-  'lmendoz@unsa.edu.pe': {
+  'vvilcaro@unsa.edu.pe': {
     role: 'DIRECTOR_FACULTAD',
     name: 'Director / Decano de Facultad',
     label: 'Dirección de Facultad (Acceso Total)',
