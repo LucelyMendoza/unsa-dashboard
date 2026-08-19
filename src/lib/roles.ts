@@ -14,7 +14,7 @@ export interface UserPermissions {
 
 export const USERS_ROLE_MAP: Record<string, UserPermissions> = {
   // Director de Facultad: Ve GENERALES y todas las escuelas
-  'lmendoza@unsa.edu.pe': {
+  'lmendoz@unsa.edu.pe': {
     role: 'DIRECTOR_FACULTAD',
     name: 'Director / Decano de Facultad',
     label: 'Dirección de Facultad (Acceso Total)',
@@ -22,7 +22,7 @@ export const USERS_ROLE_MAP: Record<string, UserPermissions> = {
   },
 
   // Director de Escuela: Ciencias y Tecnología
-  'esiug@unsa.edu.pe': {
+  'lmendoza@unsa.edu.pe': {
     role: 'DIRECTOR_CIENCIAS_TECNOLOGIA',
     name: 'Director de Escuela',
     label: 'Escuela de Ciencias y Tecnología',
