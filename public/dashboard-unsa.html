@@ -591,76 +591,100 @@ window.addEventListener('load',()=>{
   document.getElementById('foot').innerHTML='Fuente: SISACAD · Facultad de Educación · UNSA (2019–2025). '+
     'Se excluye el semestre C de todos los años. Tasas calculadas sobre matriculados por asignatura. '+
     'Los grupos con codocencia atribuyen sus métricas a cada docente. Promedio = media ponderada por matriculados.';
+  // ========== RESTRICCIÓN POR ROLES ==========
+  const __params = new URLSearchParams(window.location.search);
+  const __role = __params.get('role');
+  const __allowedRaw = __params.get('escuelas') || '';
+  const __allowedEscuelas = __allowedRaw.split(',').map(s => s.trim().toUpperCase()).filter(Boolean);
+
+  if (__role && __role !== 'DIRECTOR_FACULTAD' && __allowedEscuelas.length > 0) {
+    console.log('🔒 Restricción de rol activa:', { __role, __allowedEscuelas });
+
+    // 1. Calcular índices de escuelas permitidas
+    const __allowedIdx = new Set();
+    D.esc.forEach((nombre, idx) => {
+      const nUp = nombre.trim().toUpperCase();
+      if (__allowedEscuelas.some(ae => nUp.includes(ae) || ae.includes(nUp))) {
+        __allowedIdx.add(idx);
+      }
+    });
+    console.log('Escuelas permitidas:', [...__allowedIdx].map(i => D.esc[i]));
+
+    // 2. Pre-seleccionar solo escuelas permitidas en state
+    state.esc.clear();
+    __allowedIdx.forEach(i => state.esc.add(i));
+
+    // 3. Limpiar programas fuera de escuelas permitidas
+    [...state.prog].forEach(p => {
+      if (!__allowedIdx.has(progEsc[p])) state.prog.delete(p);
+    });
+
+    // 4. Parchear escItems para que solo muestre escuelas permitidas
+    const __origEscItems = escItems;
+    // Reasignar — escItems es const, pero podemos sobrescribir en el buildMS
+    // Reconstruir el multiselect de escuelas con items filtrados
+    const __filteredEscItems = () => __origEscItems().filter(item => __allowedIdx.has(item.v));
+    
+    // Reconstruir el ms-esc con la función filtrada
+    buildMS('ms-esc', __filteredEscItems, state.esc, () => {
+      // Al cambiar escuela, limpiar programas fuera de scope
+      if (state.esc.size) {
+        [...state.prog].forEach(p => {
+          if (!state.esc.has(progEsc[p])) state.prog.delete(p);
+        });
+      }
+      renderAll();
+    }, __allowedIdx.size > 1 ? 'Todas' : D.esc[[...__allowedIdx][0]]);
+
+    // 5. Ocultar "Todos/Ninguno" del multiselect de escuelas
+    const __msEsc = document.getElementById('ms-esc');
+    if (__msEsc) {
+      const __tools = __msEsc.querySelectorAll('.ms-tools button');
+      __tools.forEach(b => b.style.display = 'none');
+
+      // Si solo hay 1 escuela, bloquear interacción del selector
+      if (__allowedIdx.size === 1) {
+        const __btn = __msEsc.querySelector('.ms-btn');
+        if (__btn) {
+          __btn.style.pointerEvents = 'none';
+          __btn.style.opacity = '0.7';
+          __btn.style.cursor = 'default';
+        }
+      }
+      if (__msEsc._sync) __msEsc._sync();
+    }
+
+    // 6. Parchear el botón Reset para que no borre las restricciones
+    const __resetBtn = document.getElementById('resetBtn');
+    if (__resetBtn) {
+      // Quitar listener anterior y poner uno nuevo
+      const __newReset = __resetBtn.cloneNode(true);
+      __resetBtn.parentNode.replaceChild(__newReset, __resetBtn);
+      __newReset.addEventListener('click', () => {
+        // Limpiar todo excepto escuelas restringidas
+        state.esc.clear();
+        __allowedIdx.forEach(i => state.esc.add(i));
+        state.prog.clear();
+        state.per.clear();
+        state.qasig = '';
+        state.qdoc = '';
+        state.teacher = null;
+        document.getElementById('q-asig').value = '';
+        document.getElementById('q-doc').value = '';
+        ['ms-esc','ms-prog','ms-per'].forEach(id => {
+          const el = document.getElementById(id);
+          if (el && el._sync) el._sync();
+        });
+        renderAll();
+      });
+    }
+
+    console.log('✅ Restricción aplicada correctamente');
+  }
+  // ========== FIN RESTRICCIÓN ==========
+
   renderAll();
 });
-</script>
-<script>
-(function() {
-  // Obtener las escuelas permitidas desde Next.js
-  const params = new URLSearchParams(window.location.search);
-  const role = params.get('role');
-  const allowedRaw = params.get('escuelas') || '';
-  const allowedEscuelas = allowedRaw.split(',').map(s => s.trim().toUpperCase()).filter(Boolean);
-
-  console.log("Control de acceso activo:", { role, allowedEscuelas });
-
-  function aplicarRestriccion() {
-    if (!role || role === 'DIRECTOR_FACULTAD') return; // Director de Facultad tiene acceso completo
-
-    // Filtrar todos los selectores de la página
-    const selectElements = document.querySelectorAll('select');
-
-    selectElements.forEach(select => {
-      let tieneOpcionesEscuela = false;
-
-      Array.from(select.options).forEach(opt => {
-        const txt = (opt.text || opt.value || '').trim().toUpperCase();
-        
-        // Verifica si la opción pertenece al catálogo de escuelas
-        const esOpcionEscuela = ["GENERALES", "CIENCIAS Y TECNOLOGÍA", "HUMANIDADES Y LETRAS", "EDUCACIÓN BÁSICA INTEGRAL"].some(e => txt.includes(e));
-
-        if (esOpcionEscuela) {
-          tieneOpcionesEscuela = true;
-          const estaPermitida = allowedEscuelas.some(e => txt.includes(e));
-          if (!estaPermitida) {
-            opt.disabled = true;
-            opt.hidden = true;
-            opt.style.display = 'none';
-          }
-        }
-      });
-
-      // Si este select era el de escuelas, seleccionar la primera válida automáticamente
-      if (tieneOpcionesEscuela) {
-        const opcionValida = Array.from(select.options).find(o => !o.disabled && o.style.display !== 'none');
-        if (opcionValida && select.value !== opcionValida.value) {
-          select.value = opcionValida.value;
-          select.dispatchEvent(new Event('change', { bubbles: true }));
-        }
-      }
-    });
-
-    // Si tu dashboard usa botones o pestañas para cambiar de escuela en lugar de <select>
-    const botones = document.querySelectorAll('button, a, .tab-item, [role="tab"]');
-    botones.forEach(btn => {
-      const txt = (btn.innerText || btn.textContent || '').trim().toUpperCase();
-      const esBotonEscuela = ["GENERALES", "CIENCIAS Y TECNOLOGÍA", "HUMANIDADES Y LETRAS", "EDUCACIÓN BÁSICA INTEGRAL"].some(e => txt.includes(e));
-
-      if (esBotonEscuela) {
-        const estaPermitido = allowedEscuelas.some(e => txt.includes(e));
-        if (!estaPermitido) {
-          btn.style.display = 'none';
-          btn.style.pointerEvents = 'none';
-        }
-      }
-    });
-  }
-
-  // Ejecutar al cargar y tras renderizar los gráficos
-  window.addEventListener('DOMContentLoaded', aplicarRestriccion);
-  setTimeout(aplicarRestriccion, 500);
-  setTimeout(aplicarRestriccion, 1500);
-})();
 </script>
 </body>
 </html>
