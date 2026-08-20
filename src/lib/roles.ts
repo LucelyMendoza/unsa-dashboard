@@ -20,6 +20,12 @@ export const USERS_ROLE_MAP: Record<string, UserPermissions> = {
     label: 'Dirección de Facultad (Acceso Total)',
     escuelasPermitidas: ['GENERALES', 'CIENCIAS Y TECNOLOGÍA', 'HUMANIDADES Y LETRAS', 'EDUCACIÓN BÁSICA INTEGRAL'],
   },
+  'wvaldez@unsa.edu.pe': {
+    role: 'DIRECTOR_FACULTAD',
+    name: 'Director / Decano de Facultad',
+    label: 'Dirección de Facultad (Acceso Total)',
+    escuelasPermitidas: ['GENERALES', 'CIENCIAS Y TECNOLOGÍA', 'HUMANIDADES Y LETRAS', 'EDUCACIÓN BÁSICA INTEGRAL'],
+  },
 
   // Director de Escuela: Ciencias y Tecnología
   'lmendoza@unsa.edu.pe': {
