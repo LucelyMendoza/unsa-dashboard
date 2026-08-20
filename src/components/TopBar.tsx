@@ -18,7 +18,7 @@ export default function TopBar() {
               Universidad Nacional de San Agustín de Arequipa
             </p>
             <h1 className="text-xl sm:text-2xl font-serif font-bold text-white tracking-wide">
-              Tablero de Control - Rendimiento Académico
+              Tablero de Control - Facultad de Educación
             </h1>
             <p className="text-xs sm:text-sm text-crema/90 italic mt-0.5">
               Dirección de Servicios Académicos
