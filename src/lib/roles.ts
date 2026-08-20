@@ -38,7 +38,7 @@ export const USERS_ROLE_MAP: Record<string, UserPermissions> = {
   },
 
   // Director de Escuela: Educación Básica e Integral
-  'dir.educacion@unsa.edu.pe': {
+  'esiug@unsa.edu.pe': {
     role: 'DIRECTOR_EDUCACION',
     name: 'Director de Escuela',
     label: 'Escuela de Educación Básica Integral',
