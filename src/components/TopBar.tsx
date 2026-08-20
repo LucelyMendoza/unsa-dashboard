@@ -21,7 +21,7 @@ export default function TopBar() {
               Tablero de Control - Rendimiento Académico
             </h1>
             <p className="text-xs sm:text-sm text-crema/90 italic mt-0.5">
-              Dirección Universitaria de Asuntos Académicos y Seguimiento Institucional
+              Dirección de Servicios Académicos
             </p>
           </div>
 
@@ -41,7 +41,7 @@ export default function TopBar() {
 
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 px-4 sm:px-6 py-3 bg-crema border-t border-linea">
         <div className="text-[11px] uppercase tracking-wider text-texto-sec font-semibold">
-          Filtro institucional activo · Acceso verificado
+          Acceso verificado
         </div>
         <button
           onClick={logout}
